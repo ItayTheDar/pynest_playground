@@ -1,10 +1,11 @@
-from fastapi import FastAPI , HTTPException
+from fastapi import FastAPI, HTTPException
 from abc import abstractmethod, ABC
 from pynest_app_context import PyNestApplicationContext
 from typing import Any, Dict, List, Union
 from collections import defaultdict
 from pynest_container import PyNestContainer
 from router_resolver import RoutesResolver
+
 
 class DependencyGraph:
     def __init__(self):
@@ -30,40 +31,34 @@ class DependencyGraph:
             self.recursion_stack.remove(module)
         return False
 
+
 class AbstractPyNestApp(ABC):
-    
     @abstractmethod
-    def use (self, middleware_class: type, **options: Any) -> None: 
-      pass 
-    
-  
-    
+    def use(self, middleware_class: type, **options: Any) -> None:
+        pass
+
+
 class PyNestApp(PyNestApplicationContext):
     _is_listening = False
-    
+
     @property
     def is_listening(self):
-        self._is_listening 
-        
-    def __init__(self,
-                 container: PyNestContainer,
-                 http_server: FastAPI
-                 ):
+        self._is_listening
+
+    def __init__(self, container: PyNestContainer, http_server: FastAPI):
         self._container = container
         self._http_adaptater = http_server
         super().__init__(self._container)
         self.routes_resolver = RoutesResolver(self._container, self._http_adaptater)
         self.select_context_module()
         self._register_routes()
-             
-        
-    def use (self, middleware: type, **options: Any) -> None: 
+
+    def use(self, middleware: type, **options: Any) -> None:
         self._http_adaptater.add_middleware(middleware, **options)
-        return self 
-    
-    def get_server(self): 
+        return self
+
+    def get_server(self):
         return self._http_adaptater
-    
 
     def enable_cors(self, options: Dict[str, Union[str, bool, List[str]]]):
         """
@@ -86,7 +81,12 @@ class PyNestApp(PyNestApplicationContext):
         from fastapi.middleware.cors import CORSMiddleware
 
         # Define the expected keys
-        expected_keys = ["allow_origins", "allow_credentials", "allow_methods", "allow_headers"]
+        expected_keys = [
+            "allow_origins",
+            "allow_credentials",
+            "allow_methods",
+            "allow_headers",
+        ]
 
         # Check for unexpected keys
         unexpected_keys = [key for key in options if key not in expected_keys]
@@ -109,14 +109,10 @@ class PyNestApp(PyNestApplicationContext):
 
         self._http_adaptater.add_middleware(cors_middleware)
 
-        
     def _register_routes(self):
-          self.routes_resolver.register_routes()
-          if self._http_adaptater.debug: 
-               self.routes_resolver.not_found_handler()
-               
-      
-    def global_prefix(self, prefix: str): 
-         self._http_adaptater.prefix = prefix 
-        
-        
+        self.routes_resolver.register_routes()
+        if self._http_adaptater.debug:
+            self.routes_resolver.not_found_handler()
+
+    def global_prefix(self, prefix: str):
+        self._http_adaptater.prefix = prefix

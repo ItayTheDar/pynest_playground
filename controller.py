@@ -25,9 +25,9 @@ def Controller(prefix: str = None, tag: str = None):
         router = APIRouter(tags=[tag] if tag else None)
 
         for name, method in cls.__dict__.items():
-            if(name == "__init__"):
-                 print("hello")
-                 continue 
+            if name == "__init__":
+                print("hello")
+                continue
             if callable(method) and hasattr(method, "method"):
                 if not method.__path__:
                     raise Exception("Missing path")
@@ -84,8 +84,8 @@ def Controller(prefix: str = None, tag: str = None):
         cls.get_router = get_router
 
         return ClassBasedView(router=router, cls=cls)
-    return wrapper
 
+    return wrapper
 
 
 def Get(path: str, **kwargs):

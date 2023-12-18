@@ -1,12 +1,10 @@
-from decorators import Injectable 
+from decorators import Injectable
+
 
 @Injectable
-class UserService: 
-    
-      
+class UserService:
     def __init__(self, name):
-       pass 
-    
+        pass
+
     def get_user(self):
         return {"user_name": "manasse", "password": "manasse"}
-    

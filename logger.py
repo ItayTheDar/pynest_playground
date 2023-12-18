@@ -1,18 +1,22 @@
 import logging
 
+
 class ColoredFormatter(logging.Formatter):
     COLORS = {
-        'INFO': '\033[92m',  
-        'WARNING': '\033[93m',  
-        'ERROR': '\033[91m',    
-        'CRITICAL': '\033[95m'  
+        "INFO": "\033[92m",
+        "WARNING": "\033[93m",
+        "ERROR": "\033[91m",
+        "CRITICAL": "\033[95m",
     }
-    RESET = '\033[0m'
+    RESET = "\033[0m"
 
     def format(self, record):
         log_message = super(ColoredFormatter, self).format(record)
-        colored_levelname = f"{self.COLORS.get(record.levelname, '')}{record.levelname}{self.RESET}"
+        colored_levelname = (
+            f"{self.COLORS.get(record.levelname, '')}{record.levelname}{self.RESET}"
+        )
         return f"{colored_levelname}: {log_message}"
+
 
 class Logger:
     def __init__(self, name, level=logging.INFO):
@@ -24,7 +28,9 @@ class Logger:
         console_handler = logging.StreamHandler()
         console_handler.setLevel(self.logger.level)
 
-        colored_formatter = ColoredFormatter(fmt="%(asctime)s [%(levelname)s]: %(message)s ", datefmt="%Y-%m-%d %H:%M:%S")
+        colored_formatter = ColoredFormatter(
+            fmt="%(asctime)s [%(levelname)s]: %(message)s ", datefmt="%Y-%m-%d %H:%M:%S"
+        )
         console_handler.setFormatter(colored_formatter)
 
         self.logger.addHandler(console_handler)
@@ -43,4 +49,3 @@ class Logger:
 
     def critical(self, message):
         self.logger.critical(message)
-

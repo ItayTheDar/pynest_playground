@@ -1,24 +1,26 @@
 from ioc import get_di_container
 from typing import Type, Union, TypeVar, List
-from constants import ModuleMetadata, INJECTABLE_TOKEN 
+from constants import ModuleMetadata, INJECTABLE_TOKEN
+
+
 class Module:
-    def __init__(self, imports = None , controllers=None, providers=None):
+    def __init__(self, imports=None, controllers=None, providers=None):
         self.controllers = controllers or []
         self.providers = providers or []
         self.imports = imports or []
 
     def __call__(self, cls):
-        setattr(cls,ModuleMetadata.CONTROLLERS.value, self.controllers)
-        setattr(cls,ModuleMetadata.PROVIDER.value, self.providers)
+        setattr(cls, ModuleMetadata.CONTROLLERS.value, self.controllers)
+        setattr(cls, ModuleMetadata.PROVIDER.value, self.providers)
         setattr(cls, ModuleMetadata.IMPORT.value, self.imports)
         return cls
-      
+
 
 def Injectable(cls):
     setattr(cls, INJECTABLE_TOKEN, True)
     return cls
- 
-  
+
+
 class Inject:
     def __init__(self, service_class: Type):
         self.service_class = service_class
@@ -31,13 +33,16 @@ class Inject:
                 raise Exception(f"Service not found for {self.service_class}")
             instance = super(cls, cls).__new__(cls)
             class_name = self.service_class.__name__
-            service_key = "".join([char if char.islower() else f"_{char.lower()}" for char in class_name])
+            service_key = "".join(
+                [char if char.islower() else f"_{char.lower()}" for char in class_name]
+            )
             service_name = service_key.lstrip("_")
             setattr(instance, service_name, service_instance)
             return instance
 
         cls.__new__ = new_instance
         return cls
+
 
 class Inject:
     def __init__(self, service_classes):
@@ -52,13 +57,18 @@ class Inject:
                 if service_instance is None:
                     raise Exception(f"Service not found for {service_class}")
                 class_name = service_class.__name__
-                service_key = "".join([char if char.islower() else f"_{char.lower()}" for char in class_name])
+                service_key = "".join(
+                    [
+                        char if char.islower() else f"_{char.lower()}"
+                        for char in class_name
+                    ]
+                )
                 service_name = service_key.lstrip("_")
                 dependencies[service_name] = service_instance
             instance = super(cls, cls).__new__(cls)
             for key, value in dependencies.items():
-               setattr(instance, key, value)
-            
+                setattr(instance, key, value)
+
             return instance
 
         cls.__new__ = new_instance
