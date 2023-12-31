@@ -6,8 +6,8 @@ from src.user.user_service import UserService
 
 @Controller("users")
 class UserController:
-    def __init__(self, user_service: UserService):
-        pass
+
+    user_service: UserService = Depends(UserService)
 
     @Get("/me")
     def me(self):

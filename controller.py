@@ -1,33 +1,32 @@
 from fastapi.routing import APIRouter
 from helpers import class_based_view as ClassBasedView
-from fastapi import Depends
 
 
-def Controller(prefix: str = None, tag: str = None):
+def Controller(tag: str = None, prefix: str = None):
     """
     Decorator that turns a class into a controller, allowing you to define routes using FastAPI decorators.
 
     Args:
-        prefix (str, optional): The prefix to use for all routes.
         tag (str, optional): The tag to use for OpenAPI documentation.
+        prefix (str, optional): The prefix to use for all routes.
 
     Returns:
         class: The decorated class.
 
     """
-    if prefix:
-        if not prefix.startswith("/"):
-            prefix = "/" + prefix
-        if prefix.endswith("/"):
-            prefix = prefix[:-1]
+    # Use tag as default prefix if prefix is None
+    if prefix is None:
+        prefix = tag
+
+    if not prefix.startswith("/"):
+        prefix = "/" + prefix
+    if prefix.endswith("/"):
+        prefix = prefix[:-1]
 
     def wrapper(cls) -> ClassBasedView:
         router = APIRouter(tags=[tag] if tag else None)
 
         for name, method in cls.__dict__.items():
-            if name == "__init__":
-                print("hello")
-                continue
             if callable(method) and hasattr(method, "method"):
                 if not method.__path__:
                     raise Exception("Missing path")
@@ -41,35 +40,35 @@ def Controller(prefix: str = None, tag: str = None):
                             method.__path__,
                             method,
                             methods=["GET"],
-                            **method.__kwargs__
+                            **method.__kwargs__,
                         )
                     elif method.method == "POST":
                         router.add_api_route(
                             method.__path__,
                             method,
                             methods=["POST"],
-                            **method.__kwargs__
+                            **method.__kwargs__,
                         )
                     elif method.method == "PUT":
                         router.add_api_route(
                             method.__path__,
                             method,
                             methods=["PUT"],
-                            **method.__kwargs__
+                            **method.__kwargs__,
                         )
                     elif method.method == "DELETE":
                         router.add_api_route(
                             method.__path__,
                             method,
                             methods=["DELETE"],
-                            **method.__kwargs__
+                            **method.__kwargs__,
                         )
                     elif method.method == "PATCH":
                         router.add_api_route(
                             method.__path__,
                             method,
                             methods=["PATCH"],
-                            **method.__kwargs__
+                            **method.__kwargs__,
                         )
                     else:
                         raise Exception("Invalid method")

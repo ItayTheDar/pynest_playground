@@ -47,18 +47,18 @@ class PyNestApp(PyNestApplicationContext):
 
     def __init__(self, container: PyNestContainer, http_server: FastAPI):
         self._container = container
-        self._http_adaptater = http_server
+        self._http_adapter = http_server
         super().__init__(self._container)
-        self.routes_resolver = RoutesResolver(self._container, self._http_adaptater)
+        self.routes_resolver = RoutesResolver(self._container, self._http_adapter)
         self.select_context_module()
         self._register_routes()
 
     def use(self, middleware: type, **options: Any) -> None:
-        self._http_adaptater.add_middleware(middleware, **options)
+        self._http_adapter.add_middleware(middleware, **options)
         return self
 
     def get_server(self):
-        return self._http_adaptater
+        return self._http_adapter
 
     def enable_cors(self, options: Dict[str, Union[str, bool, List[str]]]):
         """
@@ -107,12 +107,12 @@ class PyNestApp(PyNestApplicationContext):
             allow_headers=allow_headers,
         )
 
-        self._http_adaptater.add_middleware(cors_middleware)
+        self._http_adapter.add_middleware(cors_middleware)
 
     def _register_routes(self):
         self.routes_resolver.register_routes()
-        if self._http_adaptater.debug:
+        if self._http_adapter.debug:
             self.routes_resolver.not_found_handler()
 
     def global_prefix(self, prefix: str):
-        self._http_adaptater.prefix = prefix
+        self._http_adapter.prefix = prefix

@@ -4,7 +4,12 @@ from constants import ModuleMetadata, INJECTABLE_TOKEN
 
 
 class Module:
-    def __init__(self, imports=None, controllers=None, providers=None):
+    def __init__(
+            self,
+            imports=None,
+            controllers=None,
+            providers=None
+    ):
         self.controllers = controllers or []
         self.providers = providers or []
         self.imports = imports or []
